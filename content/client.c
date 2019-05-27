@@ -1,14 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<netinet/in.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<string.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
 #include <ctype.h>
+#include <signal.h>
 
-#include"cJSON.h"
-#include"md5.h"
+#include "cJSON.h"
+#include "md5.h"
 
 #define BUFFER_SIZE 1024
 #define USER_SIZE 50
@@ -21,6 +22,8 @@ typedef struct User{
 User *user;
 char *login_id;
 
+int server_sock_fd;
+
 void init_user();
 void getMsgFromServer(char *msg);
 void sendMsgToOthers(char *input_msg, int server_sock_fd);
@@ -31,15 +34,27 @@ char *md5(char *msg);
 
 void delEnter(char *info);
 
+void handler_int(int seg)
+{
+	shutdown(server_sock_fd, SHUT_RDWR);
+	write(STDOUT_FILENO, "\n", 1);
+	exit(0);
+}
+
 int main(int argc, const char * argv[])
 {
+	if (signal(SIGINT, handler_int) == SIG_ERR){
+		write(STDOUT_FILENO, "error\n", 6);
+		exit(0);
+	}
+
 		struct sockaddr_in server_addr;
 		server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(11332);
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     bzero(&(server_addr.sin_zero), 8);
 
-    int server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(server_sock_fd == -1)
     {
 			printf("❌ 系统错误 创建 Socket 失败！\n");
@@ -106,6 +121,7 @@ int main(int argc, const char * argv[])
 					else
 					{
 						printf("▼ 系统提示 服务器端退出! 端开连接!\n");
+						shutdown(server_sock_fd, SHUT_RDWR);
 						exit(0);
 					}
 				}

@@ -5,6 +5,7 @@
 #include<arpa/inet.h>
 #include<string.h>
 #include<unistd.h>
+#include<signal.h>
 #include "cJSON.h"
 #include "util.h"
 
@@ -18,11 +19,32 @@ int client_fds[CONCURRENT_MAX];
 iUtil *onlineList;
 iUtil *allUsers;
 
+int server_sock_fd;
+
 void getMsgFromClient(int index,char *msg);
 void serverSendToClient(int client_fds[],char *input_msg);
 
+void handler_int(int seg)
+{
+	shutdown(server_sock_fd, SHUT_RDWR);
+	for(int i = 0; i < CONCURRENT_MAX; i++)
+    {
+        if(client_fds[i] != 0)
+        {
+			shutdown(client_fds[i], SHUT_RDWR);
+        }
+    }
+	//kill(getpid(), SIGINT);
+	write(STDOUT_FILENO, "\n", 1);
+	exit(0);
+}
+
 int main(int argc, const char * argv[])
 {
+	if (signal(SIGINT, handler_int) == SIG_ERR){
+		write(STDOUT_FILENO, "error\n", 6);
+		exit(0);
+	}
     char input_msg[BUFFER_SIZE];
     char recv_msg[BUFFER_SIZE];
     //本地地址
@@ -37,7 +59,7 @@ int main(int argc, const char * argv[])
     //创建socket
 
 	Log("=========    记录日志   ========");
-    int server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(server_sock_fd == -1)
     {
     	Log("服务端创建 Socket 失败");
