@@ -139,25 +139,29 @@ iUtil *iUtil_Load_Users(){
     if (!json) {
         Log("文件加载失败，不是标准的 Json 文件");
     }
-    printf("加载注册用户 %s\n", cJSON_Print(json));
+    //printf("加载注册用户 %s\n", cJSON_Print(json));
+    printf("加载注册用户 \n");
 
     iUtil *root = iUtil_Create();
     iUtil *node = root;
     int size = cJSON_GetArraySize(json);
     int index = 0;
+    printf("用户\t密码\n");
     for(; index < size ; index++){
         cJSON *c = cJSON_GetArrayItem(json, index);
         node->next = iUtil_Create_Iterm(
-            cJSON_GetObjectItem(c,"name")->valuestring,
-            cJSON_GetObjectItem(c,"pwd")->valuestring,
-            -1,
-            -1
-            );
+                        cJSON_GetObjectItem(c,"name")->valuestring,
+                        cJSON_GetObjectItem(c,"pwd")->valuestring,
+                        -1,
+                        -1
+                    );
+        printf("%s\t", node->next->name);
+        printf("%s\n", node->next->pwd);
         node = node->next;
     }
     //printf("用户: %s\n", root->next->name);
     printf("开始监听客户端发送的消息...\n");
-    //fflush(0);
+
     return root->next;
 }
 

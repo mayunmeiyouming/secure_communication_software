@@ -31,6 +31,9 @@ int main(int argc, const char * argv[])
     server_addr.sin_port = htons(SERVER_PORT);   
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     bzero(&(server_addr.sin_zero), 8);
+	//bzero（void *s, int n）; 
+	//参数说明：s 要置零的数据的起始地址； n 要置零的数据字节个数
+
     //创建socket
 
 	Log("=========    记录日志   ========");
@@ -159,6 +162,10 @@ int main(int argc, const char * argv[])
         				printf("客户端连接数达到最大值，新客户端加入失败 %s:%d\n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
         			}
         		}
+				else{
+					printf("accept error!\n");
+					Log("accept error!");
+				}
         	}
         	for(i = 0; i < CONCURRENT_MAX; i++)
         	{
@@ -210,8 +217,9 @@ void getMsgFromClient(int index,char *info){
 	cJSON_Minify(info);
 	cJSON *json = cJSON_Parse(info);
 	Log_S("转换接收数据完成", info);
+	//printf("接收数据%s\n", cJSON_Print(json));
 	if (!json) {
-		// printf("转码接收信息错误: %s\n", cJSON_GetErrorPtr());
+		printf("转码接收信息错误: %s\n", cJSON_GetErrorPtr());
 		Log("转码接收信息错误");
 	} else {
 		Log("开始判断消息类型...");
@@ -302,5 +310,5 @@ void getMsgFromClient(int index,char *info){
 
 		return ;
 	}
-	return ;
+	return;
 }
