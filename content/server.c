@@ -27,8 +27,8 @@ int main(int argc, const char * argv[])
     char recv_msg[BUFFER_SIZE];
     //本地地址
     struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
+    server_addr.sin_family = AF_INET;            //sin_family指代协议族，AF_INET是ipv4
+    server_addr.sin_port = htons(SERVER_PORT);   
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     bzero(&(server_addr.sin_zero), 8);
     //创建socket
@@ -304,4 +304,3 @@ void getMsgFromClient(int index,char *info){
 	}
 	return ;
 }
-

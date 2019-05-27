@@ -155,7 +155,9 @@ iUtil *iUtil_Load_Users(){
             );
         node = node->next;
     }
-    printf("用户: %s\n", root->next->name);
+    //printf("用户: %s\n", root->next->name);
+    printf("开始监听客户端发送的消息...\n");
+    //fflush(0);
     return root->next;
 }
 

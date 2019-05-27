@@ -8,6 +8,7 @@
 #include <ctype.h>
 
 #include"cJSON.h"
+#include"md5.h"
 
 #define BUFFER_SIZE 1024
 #define USER_SIZE 50
@@ -26,6 +27,7 @@ void sendMsgToOthers(char *input_msg, int server_sock_fd);
 void sendMsgToLogin(char *input_msg, int server_sock_fd);
 void sendMsgToRegister(char *input_msg, int server_sock_fd);
 void loadAllOnlineUsers(char *input_msg, int server_sock_fd);
+char *md5(char *msg);
 
 void delEnter(char *info);
 
@@ -174,6 +176,9 @@ void sendMsgToOthers(char *input_msg, int server_sock_fd){
 
 	char *to = (char *) malloc (USER_SIZE);
 	char *token = strtok(name, ",，");
+  //C 库函数 char *strtok(char *str, const char *delim) 
+	//分解字符串 str 为一组字符串，delim 为分隔符。
+
 	strcpy(to, "");
 	while(token != NULL){
 		strcat(to, token);
@@ -188,6 +193,9 @@ void sendMsgToOthers(char *input_msg, int server_sock_fd){
 	bzero(msg, BUFFER_SIZE);
 	fgets(msg, BUFFER_SIZE, stdin);
 	delEnter(msg);
+
+	
+	msg = md5(msg); 
 
 	strcpy(input_msg, "{\"type\":\"1\",\"from\":\"");
 	strcat(input_msg, user->name);
@@ -264,4 +272,27 @@ void delEnter(char *info){
 	if('\n' == info[ strlen(info) - 1 ] ){
 		info[ strlen(info) - 1 ] = '\0';
 	}
+}
+
+char *md5(char *msg)
+{
+	unsigned char decrypt[16];      
+  MD5_CTX md5;  
+  MD5Init(&md5);                
+  MD5Update(&md5,msg,strlen((char *)msg));  
+  MD5Final(&md5,decrypt);   
+	
+	char *str;
+  str = (char *)malloc(64);
+  char k[64];
+  for(int i = 0; i<32;i++)
+  {
+    k[2*i] = decrypt[i]>>4;
+    k[2*i+1] = decrypt[i]&0xf;
+  }
+	for(int i=0;i<32;i++)  
+  {
+    sprintf(&str[i],"%x",k[i]); 
+  }
+	return str;
 }
