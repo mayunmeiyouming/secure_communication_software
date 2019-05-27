@@ -260,7 +260,7 @@ void getMsgFromClient(int index,char *info){
 		} else if (strcmp(type, "0") == 0) {
 			Log_S("0 用户登录系统" , from);
 			char *pwd = cJSON_GetObjectItem(json, "pwd")->valuestring;
-			// char *msg = cJSON_GetObjectItem(json, "msg")->valuestring;
+			//char *msg = cJSON_GetObjectItem(json, "msg")->valuestring;
 			iUtil *node = allUsers;
 			while(node){
 				if( strcmp( from, node->name ) == 0 
