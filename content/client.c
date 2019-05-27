@@ -169,7 +169,7 @@ void getMsgFromServer(char *msg){
 		char *msg = cJSON_GetObjectItem(json, "msg")->valuestring;
 		char *msg_md5 = (char *) malloc (64);
 	
-		if (strcmp(type, "x") == 0){
+		if (strcmp(type, "1") == 0){
 			msg_md5 = cJSON_GetObjectItem(json, "msg_md5")->valuestring;
 		}
 
@@ -178,7 +178,7 @@ void getMsgFromServer(char *msg){
 		char *msg_md5_local = (char *) malloc (64);
 		msg_md5_local = md5(msg);
 
-		if (strcmp(type, "x") == 0){
+		if (strcmp(type, "1") == 0){
 			if(strcmp(msg_md5, msg_md5_local) != 0){
 				printf("local: %s\n", msg_md5_local);
 				printf("m: %s\n", msg_md5);
