@@ -83,7 +83,7 @@ int main(int argc, const char * argv[])
 					} else {
 						printf("▼ 请输入正确的指令 : list[列表]  send[发送]  login[登录]  register[注册]\n");
 					}
-					}
+				}
 				if(FD_ISSET(server_sock_fd, &client_fd_set))
 				{
 					bzero(recv_msg, BUFFER_SIZE);
@@ -142,6 +142,7 @@ void init_user(){
 void getMsgFromServer(char *msg){
 	// cJSON_Minify(msg);
 	cJSON *json = cJSON_Parse(msg);
+	//printf("接收数据%s\n", cJSON_Print(json));
 	if (!json) {
 		printf("▼ 系统提示 从服务器接收的数据不是标准格式, 已忽略\n");
 	}
@@ -150,13 +151,31 @@ void getMsgFromServer(char *msg){
 		char *type = cJSON_GetObjectItem(json, "type")->valuestring;
 		char *from = cJSON_GetObjectItem(json, "from")->valuestring;
 		char *msg = cJSON_GetObjectItem(json, "msg")->valuestring;
+		char *msg_md5 = (char *) malloc (64);
+	
+		if (strcmp(type, "x") == 0){
+			msg_md5 = cJSON_GetObjectItem(json, "msg_md5")->valuestring;
+		}
+
 		char *time = cJSON_GetObjectItem(json, "time")->valuestring;
 
+		char *msg_md5_local = (char *) malloc (64);
+		msg_md5_local = md5(msg);
+
+		if (strcmp(type, "x") == 0){
+			if(strcmp(msg_md5, msg_md5_local) != 0){
+				printf("local: %s\n", msg_md5_local);
+				printf("m: %s\n", msg_md5);
+				printf("信息被篡改！\n");
+				return;
+			}
+		}
 		if( strcmp (type, "x") == 0 ){
 			printf("● %s 在线列表 > [ %s ]\n", time, msg);
 		} else {
 			printf("● %s 收到消息 来自 [ %s ] > %s\n", time, from, msg);
 		}
+			
 
 		if( strcmp(type, "8") == 0 ){
 			strcpy(user->name, login_id);
