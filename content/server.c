@@ -106,7 +106,7 @@ int main(int argc, const char * argv[])
         {
         	max_fd = server_sock_fd;
         }
-		//客户端连接
+		//寻找客户端连接句柄中的最大的句柄
         for(i = 0; i < CONCURRENT_MAX; i++)
         {
         	if(client_fds[i] != 0)
@@ -131,7 +131,7 @@ int main(int argc, const char * argv[])
         }
         else
         {
-        	//ret 为未状态发生变化的文件描述符的个数
+        	//ret 为状态发生变化的文件描述符的个数
         	if(FD_ISSET(STDIN_FILENO, &server_fd_set))
         	{	
 				printf("> ");
