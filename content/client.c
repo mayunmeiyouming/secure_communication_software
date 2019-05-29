@@ -13,6 +13,9 @@
 
 #define BUFFER_SIZE 1024
 #define USER_SIZE 50
+#define KEY 0xfe
+#define MAX 1024
+
 
 typedef struct User{
 	char *name;
@@ -167,6 +170,19 @@ void getMsgFromServer(char *msg){
 		char *type = cJSON_GetObjectItem(json, "type")->valuestring;
 		char *from = cJSON_GetObjectItem(json, "from")->valuestring;
 		char *msg = cJSON_GetObjectItem(json, "msg")->valuestring;
+		if (strcmp(type, "1") == 0){
+			int len = strlen(msg);
+			char decode[MAX] = {0};
+			int i;
+
+			for( i = 0; i < len; i++){
+				decode[i] = msg[i] ^ KEY;
+			}
+
+			msg = decode;
+		}
+			
+
 		char *msg_md5 = (char *) malloc (64);
 	
 		if (strcmp(type, "1") == 0){
@@ -230,21 +246,29 @@ void sendMsgToOthers(char *input_msg, int server_sock_fd){
 		}
 	}
 
-	printf("> 输入消息内容: ");
+	printf("> 输入消息内容(注意小于1024字节): ");
 	char *msg = (char *) malloc (BUFFER_SIZE);
 	bzero(msg, BUFFER_SIZE);
 	fgets(msg, BUFFER_SIZE, stdin);
 	delEnter(msg);
 
 	char *msg_md5 = (char *) malloc (64);
-	msg_md5 = md5(msg); 
+	msg_md5 = md5(msg);
+
+	int len = strlen(msg);
+	char encrypt[MAX] = {0};
+	int i;
+
+	for( i = 0; i < len; i++){
+		encrypt[i] = msg[i] ^ KEY;
+	}
 
 	strcpy(input_msg, "{\"type\":\"1\",\"from\":\"");
 	strcat(input_msg, user->name);
 	strcat(input_msg, "\", \"to\":[\"");
 	strcat(input_msg, to);
 	strcat(input_msg, "\"], \"msg\":\"");
-	strcat(input_msg, msg);
+	strcat(input_msg, encrypt);
 	strcat(input_msg, "\", \"msg_md5\":\"");
 	strcat(input_msg, msg_md5);
 	strcat(input_msg, "\"}");
