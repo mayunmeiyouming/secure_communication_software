@@ -24,7 +24,7 @@ int server_sock_fd;
 void getMsgFromClient(int index,char *msg);
 void serverSendToClient(int client_fds[],char *input_msg);
 
-void handler_int(int seg)
+void handler_int(int seg)		//异常处理函数
 {
 	shutdown(server_sock_fd, SHUT_RDWR);
 	for(int i = 0; i < CONCURRENT_MAX; i++)

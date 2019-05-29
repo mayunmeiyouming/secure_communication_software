@@ -37,7 +37,7 @@ char *md5(char *msg);
 
 void delEnter(char *info);
 
-void handler_int(int seg)
+void handler_int(int seg)				//异常处理函数
 {
 	shutdown(server_sock_fd, SHUT_RDWR);
 	write(STDOUT_FILENO, "\n", 1);
